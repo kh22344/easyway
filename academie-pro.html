@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Académie Pro | Learn French with Rayan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&family=Noto+Sans+SC:wght@500;700&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root{
+  --green:#58cc02;--green-d:#46a302;--blue:#1cb0f6;--blue-d:#1899d6;--red:#ff4b4b;--red-d:#d43f3f;
+  --gold:#ffc800;--gold-d:#c79c00;--purple:#ce82ff;--bg:#0b1220;--card:rgba(24,34,54,.92);--line:rgba(255,255,255,.10);
+  --text:#f4f7fb;--muted:#93a3ba;--font:'Plus Jakarta Sans','Noto Sans SC','Noto Sans Devanagari',system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+[dir="rtl"]{--font:'Cairo','Plus Jakarta Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+html{-webkit-text-size-adjust:100%}
+body{min-height:100vh;color:var(--text);display:flex;flex-direction:column;overflow-x:hidden;
+  background:radial-gradient(1200px 700px at 15% -10%,#1e2a5a 0%,transparent 60%),radial-gradient(900px 600px at 100% 10%,#3a1450 0%,transparent 55%),var(--bg);
+  background-attachment:fixed}
+button{cursor:pointer;color:inherit;font:inherit;border:none;background:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* 3D floating background */
+#bg3d{position:fixed;inset:0;pointer-events:none;perspective:900px;z-index:0;overflow:hidden}
+#bg3d .layer{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .25s ease-out}
+.shp{position:absolute;opacity:.10;font-weight:800;color:#fff;animation:floaty var(--d) ease-in-out infinite alternate;will-change:transform}
+@keyframes floaty{from{transform:translate3d(0,0,var(--z)) rotateX(0) rotateY(0) rotateZ(0)}to{transform:translate3d(40px,-70px,var(--z)) rotateX(160deg) rotateY(200deg) rotateZ(40deg)}}
+
+/* Header */
+header{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:.8rem clamp(1rem,3vw,2rem);background:rgba(11,18,32,.8);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);animation:dropIn .7s var(--ease) backwards}
+@keyframes dropIn{from{transform:translateY(-100%);opacity:0}to{transform:none;opacity:1}}
+.logo{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.15rem;color:var(--green)}
+.logo i{font-style:normal;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--green),#2f9e00);color:#fff;box-shadow:0 3px 0 var(--green-d);animation:logoSpin 6s var(--ease) infinite}
+@keyframes logoSpin{0%,80%,100%{transform:rotateY(0)}90%{transform:rotateY(360deg)}}
+.stats{display:flex;align-items:center;gap:.4rem}
+.stat{display:flex;align-items:center;gap:.35rem;padding:.4rem .75rem;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:800;font-size:.95rem}
+.stat.s{color:var(--gold)}.stat.x{color:var(--blue)}.stat.h{color:var(--red)}
+.stat.s .fl{display:inline-block;animation:flame 1.2s ease-in-out infinite alternate;transform-origin:50% 90%}
+@keyframes flame{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.18) rotate(5deg)}}
+.stat.low .hr{display:inline-block;animation:beat .8s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.3)}60%{transform:scale(1)}}
+.stat.bump{animation:bump .5s var(--ease)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.3) rotateX(30deg)}100%{transform:scale(1)}}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:1.05rem;transition:.15s}
+.icon-btn:hover{background:rgba(255,255,255,.12);transform:rotate(15deg) scale(1.08)}
+
+/* Layout */
+.wrap{position:relative;z-index:1;width:100%;max-width:1100px;margin:0 auto;padding:1.5rem clamp(1rem,3vw,2rem) 3rem;display:grid;grid-template-columns:320px 1fr;gap:1.75rem;flex:1;animation:pageIn .9s var(--ease) backwards}
+@keyframes pageIn{from{opacity:0;transform:perspective(1200px) rotateX(10deg) translateY(40px)}to{opacity:1;transform:none}}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}.side{position:static!important}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:1.5rem;box-shadow:0 20px 40px -20px rgba(0,0,0,.6)}
+.side{padding:1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center;height:fit-content;position:sticky;top:84px;animation:slideSide .9s var(--ease) .1s backwards}
+@keyframes slideSide{from{opacity:0;transform:perspective(900px) rotateY(-25deg) translateX(-40px)}to{opacity:1;transform:none}}
+[dir="rtl"] .side{animation-name:slideSideR}
+@keyframes slideSideR{from{opacity:0;transform:perspective(900px) rotateY(25deg) translateX(40px)}to{opacity:1;transform:none}}
+#mascot{width:220px;height:220px;cursor:pointer;display:grid;place-items:center;font-size:6rem}
+#mascot canvas{display:block;max-width:100%;height:auto!important}
+.side h3{font-weight:800;font-size:1.3rem;color:var(--green)}
+.side small{color:var(--muted);font-size:.8rem}
+.bubble{position:relative;margin-top:1rem;width:100%;background:#fff;color:#0f172a;padding:.95rem 1rem;border-radius:1.1rem;font-weight:700;font-size:.93rem;line-height:1.45;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.bubble.pop{animation:bubblePop .45s var(--ease)}
+@keyframes bubblePop{from{transform:perspective(500px) rotateX(-40deg) scale(.9);opacity:.2}to{transform:none;opacity:1}}
+.bubble::before{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:0 solid transparent;border-width:0 9px 9px;border-bottom-color:#fff}
+
+/* Track card */
+.track{padding:1.1rem 1.3rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;animation:pageIn .9s var(--ease) .15s backwards}
+.track h2{font-size:1.25rem;font-weight:800;color:var(--blue)}
+.track p{font-size:.85rem;color:var(--muted);margin-top:.15rem}
+.meter{height:10px;width:200px;max-width:100%;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:.55rem}
+.meter b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#9be22d);border-radius:99px;transition:width .8s var(--ease)}
+.chip-btn{padding:.55rem 1rem;border-radius:.8rem;border:2px solid var(--line);font-weight:700;font-size:.85rem;transition:.15s}
+.chip-btn:hover{border-color:var(--blue);background:rgba(28,176,246,.1);transform:translateY(-2px)}
+
+/* Path */
+.path{display:flex;flex-direction:column;align-items:center;gap:2.2rem;padding:1rem 0 2rem;perspective:1000px}
+.nodewrap{transition:transform .3s}
+.node{--rx:0deg;--ry:0deg;--s:1;position:relative;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.5rem;color:#fff;
+  background:var(--green);border:4px solid rgba(255,255,255,.9);box-shadow:0 8px 0 var(--green-d),0 14px 24px rgba(0,0,0,.4);
+  transform:perspective(500px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s));transition:transform .12s,box-shadow .12s;
+  animation:nodeIn .7s var(--ease) backwards;animation-delay:calc(var(--i)*90ms + .3s)}
+@keyframes nodeIn{from{opacity:0;transform:perspective(500px) translateZ(-300px) rotateX(70deg) scale(.4)}to{opacity:1}}
+.node:hover:not(:disabled){--s:1.08}
+.node:active:not(:disabled){--s:.96;box-shadow:0 3px 0 var(--green-d)}
+.node.done{background:var(--gold);box-shadow:0 8px 0 var(--gold-d),0 14px 24px rgba(0,0,0,.4)}
+.node.done span{display:inline-block;animation:coin 4s ease-in-out infinite}
+@keyframes coin{0%,70%,100%{transform:rotateY(0)}85%{transform:rotateY(360deg)}}
+.node.locked{background:#4b5a72;box-shadow:0 8px 0 #263248;border-color:rgba(255,255,255,.3);cursor:not-allowed;opacity:.7}
+.node.current{animation:nodeIn .7s var(--ease) backwards,pulse 1.8s .9s infinite,bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+@keyframes pulse{0%,100%{box-shadow:0 8px 0 var(--green-d),0 0 0 0 rgba(88,204,2,.55)}50%{box-shadow:0 8px 0 var(--green-d),0 0 0 18px rgba(88,204,2,0)}}
+.node em{position:absolute;top:calc(100% + 12px);font-style:normal;font-size:.72rem;font-weight:700;white-space:nowrap;padding:.15rem .6rem;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted)}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;z-index:200;display:flex;justify-content:center;align-items:center;padding:1rem;background:rgba(6,10,20,.88);backdrop-filter:blur(16px);animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{width:100%;max-width:520px;padding:2rem;text-align:center;animation:pop .5s var(--ease)}
+@keyframes pop{from{transform:perspective(900px) rotateX(28deg) translateY(30px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+.flip3d{animation:flipIn .7s var(--ease)}
+@keyframes flipIn{from{transform:perspective(1000px) rotateY(-90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.modal h2{font-size:1.65rem;font-weight:800;color:var(--green);margin-bottom:.4rem}
+.modal p{color:var(--muted);font-size:.93rem;margin-bottom:1.4rem;line-height:1.5}
+.field{text-align:start;margin-bottom:1.1rem}
+.field label{display:block;font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.field select{width:100%;padding:.85rem 1rem;border-radius:.85rem;background:#0e1626;color:var(--text);border:2px solid var(--line);font-size:1rem}
+.field select:focus{border-color:var(--green);outline:none}
+.btn{display:block;width:100%;padding:.95rem 1.5rem;border-radius:1rem;font-weight:800;font-size:1rem;letter-spacing:.02em;text-transform:uppercase;color:#fff;background:var(--green);box-shadow:0 5px 0 var(--green-d);transition:.08s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--green-d)}
+.btn:disabled{background:#3a4658;box-shadow:0 5px 0 #28323f;color:#8392a8;cursor:not-allowed}
+.btn.red{background:var(--red);box-shadow:0 5px 0 var(--red-d)}
+.btn.blue{background:var(--blue);box-shadow:0 5px 0 var(--blue-d)}
+.btn+.btn{margin-top:.8rem}
+.closex{position:absolute;top:.8rem;inset-inline-end:1rem;font-size:1.3rem;color:var(--muted);padding:.3rem .5rem}
+.closex:hover{color:var(--text)}
+
+/* Mode picker */
+.picker{position:relative;width:100%;max-width:860px;padding:1.8rem;animation:pop .5s var(--ease)}
+.picker h2{font-size:1.6rem;font-weight:800;color:var(--green)}
+.picker p{color:var(--muted);font-size:.9rem;margin:.3rem 0 1.3rem}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;perspective:1100px}
+.mode{--rx:0deg;--ry:0deg;position:relative;text-align:start;padding:1.1rem;border-radius:1.2rem;border:2px solid var(--line);border-bottom-width:6px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+  transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry));transition:transform .12s,border-color .2s,background .2s;transform-style:preserve-3d;
+  animation:modeIn .65s var(--ease) backwards;animation-delay:calc(var(--i)*70ms)}
+@keyframes modeIn{from{opacity:0;transform:perspective(800px) rotateY(-80deg) translateZ(-120px)}to{opacity:1}}
+.mode:hover{border-color:var(--c,var(--blue));background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03))}
+.mode .ico{display:block;font-size:2.2rem;margin-bottom:.4rem;transform:translateZ(40px);filter:drop-shadow(0 8px 6px rgba(0,0,0,.4));transition:transform .3s var(--ease)}
+.mode:hover .ico{transform:translateZ(60px) scale(1.15) rotate(-6deg)}
+.mode b{display:block;font-size:1.02rem;font-weight:800;transform:translateZ(25px)}
+.mode small{display:block;color:var(--muted);font-size:.8rem;line-height:1.4;margin-top:.2rem}
+.mode .badge{position:absolute;top:.7rem;inset-inline-end:.7rem;font-size:.65rem;font-weight:800;text-transform:uppercase;padding:.15rem .5rem;border-radius:99px;background:rgba(88,204,2,.2);color:var(--green)}
+.mode .badge.done{background:rgba(255,200,0,.2);color:var(--gold)}
+
+/* Lesson / practice shell */
+#lesson,#prac{z-index:150;background:var(--bg);flex-direction:column;justify-content:flex-start;align-items:stretch;padding:0;backdrop-filter:none;animation:shellIn .6s var(--ease)}
+@keyframes shellIn{from{opacity:0;transform:perspective(1400px) rotateX(14deg) translateY(60px) scale(.94)}to{opacity:1;transform:none}}
+.lbar{display:flex;align-items:center;gap:1rem;padding:1rem clamp(1rem,4vw,2rem);max-width:820px;width:100%;margin:0 auto}
+.lbar .x{font-size:1.3rem;color:var(--muted);padding:.3rem .5rem}
+.lbar .x:hover{color:var(--text)}
+.pbar{flex:1;height:16px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.pbar b{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .5s var(--ease);position:relative}
+.pbar b::after{content:'';position:absolute;inset:4px 8px auto;height:4px;border-radius:9px;background:rgba(255,255,255,.35)}
+.lbody{flex:1;overflow:auto;max-width:820px;width:100%;margin:0 auto;padding:1rem clamp(1rem,4vw,2rem) 2rem;perspective:1400px}
+.qenter{animation:qEnter .6s var(--ease)}
+@keyframes qEnter{from{opacity:0;transform:rotateY(-40deg) translateX(80px) translateZ(-200px)}to{opacity:1;transform:none}}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:.3rem .75rem;border-radius:99px;background:rgba(28,176,246,.18);color:var(--blue);margin-bottom:.8rem}
+.qtitle{font-size:clamp(1.2rem,3vw,1.6rem);font-weight:800;margin-bottom:1rem}
+.prompt{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.25rem;border-radius:1.2rem;border:2px solid var(--line);background:rgba(255,255,255,.03);font-size:clamp(1.1rem,3vw,1.5rem);font-weight:700;margin-bottom:1.4rem}
+.say{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;background:rgba(28,176,246,.18);border:2px solid var(--blue);transition:.15s}
+.say:hover{transform:scale(1.1) rotate(-8deg)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:center;gap:.8rem;padding:1rem 1.1rem;border-radius:1rem;border:2px solid var(--line);border-bottom-width:5px;background:rgba(255,255,255,.03);font-weight:700;font-size:1.05rem;text-align:start;transition:.12s;animation:optIn .5s var(--ease) backwards;animation-delay:calc(var(--i)*70ms + .15s)}
+@keyframes optIn{from{opacity:0;transform:perspective(600px) rotateX(-50deg) translateY(20px)}to{opacity:1}}
+.opt kbd{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font-size:.8rem;color:var(--muted);font-family:inherit}
+.opt:hover:not(:disabled){background:rgba(28,176,246,.08);border-color:rgba(28,176,246,.5);transform:translateY(-2px)}
+.opt.sel{border-color:var(--blue);background:rgba(28,176,246,.18)}
+.opt.ok{border-color:var(--green);background:rgba(88,204,2,.18);animation:okPop .5s var(--ease)}
+.opt.no{border-color:var(--red);background:rgba(255,75,75,.15);animation:shake .4s}
+@keyframes okPop{0%{transform:scale(1)}40%{transform:perspective(500px) scale(1.06) rotateX(12deg)}100%{transform:scale(1)}}
+.opt:disabled{cursor:default}
+.blank{display:inline-block;min-width:90px;border-bottom:3px solid var(--blue);text-align:center;padding:0 .4rem;color:var(--blue)}
+.slot{min-height:76px;display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;padding:.8rem 0;margin-bottom:1rem;border-top:2px solid var(--line);border-bottom:2px solid var(--line);background:repeating-linear-gradient(transparent,transparent 62px,var(--line) 62px,var(--line) 64px)}
+.bank{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center}
+.wchip{padding:.65rem 1rem;border-radius:.85rem;border:2px solid var(--line);border-bottom-width:5px;background:#16213a;font-weight:700;font-size:1rem;transition:.1s;animation:chipIn .35s var(--ease)}
+@keyframes chipIn{from{opacity:0;transform:translateY(-14px) scale(.8)}to{opacity:1}}
+.wchip:hover:not(:disabled){border-color:var(--blue);transform:translateY(-2px)}
+.wchip.ghost{opacity:.15;pointer-events:none;animation:none}
+.wchip:disabled{cursor:default}
+.lfoot{border-top:2px solid var(--line);padding:1rem clamp(1rem,4vw,2rem);transition:background .2s}
+.lfoot .in{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.lfoot .msg{flex:1;min-width:0}
+.lfoot .msg strong{display:block;font-size:1.2rem;font-weight:800}
+.lfoot .msg span{display:block;font-size:.92rem;margin-top:.15rem;word-break:break-word}
+.lfoot .btn{width:auto;min-width:170px}
+.lfoot.ok{background:rgba(88,204,2,.14);color:#b8f27a}
+.lfoot.no{background:rgba(255,75,75,.14);color:#ffb0b0}
+.lfoot.ok,.lfoot.no{animation:footUp .4s var(--ease)}
+@keyframes footUp{from{transform:translateY(60px);opacity:.3}to{transform:none;opacity:1}}
+.lfoot.no .btn{background:var(--red);box-shadow:0 5px 0 var(--red-d)}
+@media(max-width:560px){.lfoot .in{flex-direction:column;align-items:stretch}.lfoot .btn{width:100%}}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+
+/* New question types */
+.listenbig{display:flex;gap:1rem;justify-content:center;align-items:center;margin:.5rem 0 1.6rem}
+.bigsay{width:110px;height:110px;border-radius:50%;font-size:2.6rem;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),#0f7fc0);box-shadow:0 8px 0 var(--blue-d),0 0 0 0 rgba(28,176,246,.5);animation:ripple 2s infinite;transition:transform .1s}
+.bigsay:active{transform:translateY(4px);box-shadow:0 3px 0 var(--blue-d)}
+@keyframes ripple{0%{box-shadow:0 8px 0 var(--blue-d),0 0 0 0 rgba(28,176,246,.5)}100%{box-shadow:0 8px 0 var(--blue-d),0 0 0 36px rgba(28,176,246,0)}}
+.slow{width:56px;height:56px;border-radius:50%;font-size:1.5rem;display:grid;place-items:center;background:rgba(255,255,255,.07);border:2px solid var(--line)}
+.tin{width:100%;padding:1rem 1.2rem;border-radius:1rem;border:2px solid var(--line);background:#0e1626;color:var(--text);font-size:1.25rem;font-weight:700;transition:border-color .2s,box-shadow .2s}
+.tin:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(28,176,246,.2);outline:none}
+.accents{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.8rem}
+.accents button{width:42px;height:42px;border-radius:.7rem;border:2px solid var(--line);border-bottom-width:4px;font-weight:800;font-size:1.05rem;background:#16213a;transition:.1s}
+.accents button:hover{border-color:var(--purple);transform:translateY(-2px)}
+.micwrap{display:flex;flex-direction:column;align-items:center;gap:1rem;margin-top:.5rem}
+.mic{width:96px;height:96px;border-radius:50%;font-size:2.4rem;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),#8a3fd1);box-shadow:0 7px 0 #6a2ca3;transition:transform .1s}
+.mic:active{transform:translateY(4px)}
+.mic.on{animation:micPulse 1s infinite;background:linear-gradient(135deg,var(--red),#c22)}
+@keyframes micPulse{0%{box-shadow:0 7px 0 #8d1f1f,0 0 0 0 rgba(255,75,75,.6)}100%{box-shadow:0 7px 0 #8d1f1f,0 0 0 34px rgba(255,75,75,0)}}
+.heard{min-height:1.6rem;color:var(--muted);font-weight:700;text-align:center}
+
+/* Flashcards (3D flip) */
+.pstage{perspective:1400px;display:flex;flex-direction:column;align-items:center;gap:1.4rem}
+.scene3d{width:min(420px,100%);height:260px;perspective:1200px;animation:cardIn .7s var(--ease)}
+@keyframes cardIn{from{opacity:0;transform:rotateY(-80deg) translateX(120px) translateZ(-200px)}to{opacity:1;transform:none}}
+.scene3d.out-ok{animation:outOk .5s var(--ease) forwards}
+.scene3d.out-no{animation:outNo .5s var(--ease) forwards}
+@keyframes outOk{to{opacity:0;transform:translateX(120%) rotateY(55deg) rotateZ(14deg)}}
+@keyframes outNo{to{opacity:0;transform:translateX(-120%) rotateY(-55deg) rotateZ(-14deg)}}
+.fcard{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s var(--ease);cursor:pointer}
+.fcard.flip{transform:rotateY(180deg)}
+.fcard:hover:not(.flip){transform:rotateY(-8deg) rotateX(4deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1.6rem;border:2px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;padding:1.5rem;text-align:center;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;box-shadow:0 24px 40px -18px rgba(0,0,0,.7)}
+.face.f{background:linear-gradient(145deg,#22407a,#2b2260)}
+.face.b{background:linear-gradient(145deg,#1d5a3a,#1b3d5c);transform:rotateY(180deg)}
+.face small{font-size:.8rem;color:rgba(255,255,255,.6);font-weight:600}
+.frow{display:flex;gap:1rem;width:min(420px,100%)}
+.frow .btn{flex:1}
+.hint{color:var(--muted);font-size:.85rem;font-weight:600}
+
+/* Memory */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;width:100%;perspective:1400px}
+.tile{aspect-ratio:4/3;perspective:800px;cursor:pointer;animation:tileIn .6s var(--ease) backwards;animation-delay:calc(var(--i)*50ms)}
+@keyframes tileIn{from{opacity:0;transform:rotateX(90deg) translateY(30px)}to{opacity:1}}
+.tinner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s var(--ease)}
+.tile.open .tinner,.tile.done .tinner{transform:rotateY(180deg)}
+.tile:hover:not(.open):not(.done) .tinner{transform:rotateY(-14deg) translateZ(10px)}
+.tf,.tb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem;display:grid;place-items:center;padding:.5rem;text-align:center;font-weight:700;border:2px solid var(--line)}
+.tf{background:linear-gradient(135deg,#1c2b4d,#2a1a4a);font-size:2rem}
+.tb{transform:rotateY(180deg);background:#16213a;font-size:.95rem;line-height:1.3}
+.tile.done .tb{border-color:var(--green);background:rgba(88,204,2,.18);box-shadow:0 0 26px rgba(88,204,2,.4)}
+.tile.done{animation:matchPop .6s var(--ease)}
+@keyframes matchPop{40%{transform:scale(1.1) translateZ(30px)}}
+.tile.bad .tb{border-color:var(--red)}
+.minfo{display:flex;gap:1.2rem;color:var(--muted);font-weight:700;margin-bottom:1rem}
+
+/* Speed */
+.timer{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;width:100%;margin-bottom:1.2rem}
+.timer b{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--red));transform-origin:left}
+.sbig{font-size:2.4rem;font-weight:800;color:var(--gold)}
+
+/* Result */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.2rem 0 1.6rem}
+.result-grid div{padding:.9rem;border-radius:1rem;border:2px solid var(--line);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;animation:cardIn .7s var(--ease) backwards}
+.result-grid div:nth-child(2){animation-delay:.15s}
+.result-grid b{display:block;font-size:1.7rem;margin-top:.2rem;letter-spacing:0}
+.big-emoji{font-size:3.6rem;margin-bottom:.4rem;display:inline-block;animation:trophy 1.4s var(--ease)}
+@keyframes trophy{0%{transform:rotateY(0) scale(.3)}60%{transform:rotateY(540deg) scale(1.3)}100%{transform:rotateY(720deg) scale(1)}}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="bg3d" aria-hidden="true"><div class="layer" id="bgLayer"></div></div>
+
+<!-- Onboarding -->
+<div class="overlay" id="onboard" role="dialog" aria-modal="true" aria-labelledby="obTitle" hidden>
+  <div class="panel modal">
+    <h2 id="obTitle">L'Académie Pro ⚜️</h2>
+    <p data-i18n="sub"></p>
+    <form id="obForm">
+      <div class="field">
+        <label for="selLang" data-i18n="lblLang"></label>
+        <select id="selLang">
+          <option value="en">English</option><option value="ar">العربية (Arabic)</option><option value="es">Español</option>
+          <option value="fr">Français</option><option value="de">Deutsch</option><option value="zh">中文</option>
+          <option value="ru">Русский</option><option value="pt">Português</option><option value="tr">Türkçe</option><option value="hi">हिन्दी</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="selLevel" data-i18n="lblLevel"></label>
+        <select id="selLevel">
+          <option value="A1">A1 · Beginner</option><option value="A2">A2 · Elementary</option><option value="B1">B1 · Intermediate</option>
+          <option value="B2">B2 · Upper intermediate</option><option value="C1">C1 · Advanced</option><option value="C2">C2 · Mastery</option>
+        </select>
+      </div>
+      <button class="btn" type="submit" data-i18n="start"></button>
+    </form>
+  </div>
+</div>
+
+<header>
+  <div class="logo"><i>⚜</i><span>L'Académie Pro</span></div>
+  <div class="stats">
+    <div class="stat s" id="stStreak" title="Streak"><span class="fl">🔥</span> <span id="vStreak">0</span></div>
+    <div class="stat x" id="stXp">⚡ <span id="vXp">0</span></div>
+    <div class="stat h" id="stHearts"><span class="hr">❤️</span> <span id="vHearts">5</span></div>
+    <button class="icon-btn" id="btnSound" aria-label="Sound">🔊</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel side">
+    <div id="mascot" aria-label="Rayan"></div>
+    <h3>Rayan</h3>
+    <small data-i18n="role"></small>
+    <div class="bubble" id="bubble" aria-live="polite"></div>
+  </aside>
+  <main>
+    <div class="panel track">
+      <div>
+        <h2 id="trackTitle"></h2>
+        <p id="trackDesc"></p>
+        <div class="meter"><b id="trackMeter"></b></div>
+      </div>
+      <button class="chip-btn" id="btnChange" data-i18n="change"></button>
+    </div>
+    <div class="path" id="path"></div>
+  </main>
+</div>
+
+<!-- Mode picker -->
+<div class="overlay" id="picker" hidden>
+  <div class="panel picker">
+    <button class="closex" id="pickX" aria-label="Close">✕</button>
+    <h2 id="pickTitle"></h2>
+    <p id="pickTip"></p>
+    <div class="modes" id="modes"></div>
+  </div>
+</div>
+
+<!-- Lesson / listening / typing / speaking -->
+<div class="overlay" id="lesson" hidden>
+  <div class="lbar">
+    <button class="x" id="btnQuit" aria-label="Close">✕</button>
+    <div class="pbar"><b id="lessonBar"></b></div>
+    <div class="stat h" id="stLHearts"><span class="hr">❤️</span> <span id="lHearts">5</span></div>
+  </div>
+  <div class="lbody"><div id="qArea"></div></div>
+  <div class="lfoot" id="foot">
+    <div class="in"><div class="msg" id="footMsg"></div><button class="btn" id="btnMain"></button></div>
+  </div>
+</div>
+
+<!-- Flashcards / memory / speed -->
+<div class="overlay" id="prac" hidden>
+  <div class="lbar">
+    <button class="x" id="pracX" aria-label="Close">✕</button>
+    <div class="pbar"><b id="pracBar"></b></div>
+    <div class="stat x" id="pracInfo"></div>
+  </div>
+  <div class="lbody"><div id="pracBody" class="pstage"></div></div>
+</div>
+
+<!-- Result / game over -->
+<div class="overlay" id="result" hidden style="z-index:300">
+  <div class="panel modal" id="resultBox"></div>
+</div>
+
+<script>
+"use strict";
+/* ============ i18n ============ */
+const I18N={
+en:{sub:"Choose your native language and French level. Every lesson instruction will appear in your language.",lblLang:"Native language",lblLevel:"French level",start:"Start learning",role:"Your 3D AI tutor",hello:"Bonjour! I'm Rayan. Pick a stage on the map to begin!",good:"Magnifique! 🎉",bad:"Oups! Don't worry, keep going 💪",check:"Check",cont:"Continue",stage:"Stage",track:"Level path",trackDesc:"Complete all stages to master this level.",right:"Correct!",answer:"Correct answer:",done:"Lesson complete!",xp:"XP earned",acc:"Accuracy",map:"Back to map",over:"Out of hearts!",overTxt:"Don't give up. Refill your hearts and try again.",refill:"Refill hearts",change:"Change language / level",quit:"Quit this lesson? Your progress in it will be lost.",tagV:"Vocabulary",tagG:"Grammar",tagB:"Sentence builder",qV:"Choose the French for:",qG:"Complete the sentence:",qB:"Build the French sentence:",stages:"stages"},
+ar:{sub:"اختر لغتك الأم ومستواك في الفرنسية. ستظهر جميع تعليمات الدروس بلغتك.",lblLang:"اللغة الأم",lblLevel:"مستوى الفرنسية",start:"ابدأ التعلم",role:"مدرّبك الذكي ثلاثي الأبعاد",hello:"مرحباً! أنا ريان. اختر مرحلة من الخريطة لنبدأ!",good:"ممتاز! 🎉",bad:"أوه! لا تقلق، تابع المحاولة 💪",check:"تحقق",cont:"متابعة",stage:"المرحلة",track:"مسار المستوى",trackDesc:"أكمل جميع المراحل لإتقان هذا المستوى.",right:"إجابة صحيحة!",answer:"الإجابة الصحيحة:",done:"اكتمل الدرس!",xp:"نقاط الخبرة",acc:"الدقة",map:"العودة إلى الخريطة",over:"نفدت القلوب!",overTxt:"لا تستسلم. اشحن قلوبك وحاول مجدداً.",refill:"إعادة شحن القلوب",change:"تغيير اللغة / المستوى",quit:"هل تريد إنهاء الدرس؟ سيضيع تقدمك فيه.",tagV:"مفردات",tagG:"قواعد",tagB:"بناء الجملة",qV:"اختر الكلمة الفرنسية لـ:",qG:"أكمل الجملة:",qB:"كوّن الجملة الفرنسية:",stages:"مراحل"},
+es:{sub:"Elige tu idioma nativo y tu nivel de francés. Las instrucciones aparecerán en tu idioma.",lblLang:"Idioma nativo",lblLevel:"Nivel de francés",start:"Empezar",role:"Tu tutor 3D con IA",hello:"¡Bonjour! Soy Rayan. ¡Elige una etapa en el mapa para empezar!",good:"¡Magnifique! 🎉",bad:"¡Oups! No te preocupes, sigue 💪",check:"Comprobar",cont:"Continuar",stage:"Etapa",track:"Ruta de nivel",trackDesc:"Completa todas las etapas para dominar este nivel.",right:"¡Correcto!",answer:"Respuesta correcta:",done:"¡Lección completada!",xp:"XP ganados",acc:"Precisión",map:"Volver al mapa",over:"¡Sin corazones!",overTxt:"No te rindas. Recarga tus corazones e inténtalo de nuevo.",refill:"Recargar corazones",change:"Cambiar idioma / nivel",quit:"¿Salir de la lección? Perderás su progreso.",tagV:"Vocabulario",tagG:"Gramática",tagB:"Construir frase",qV:"Elige el francés para:",qG:"Completa la frase:",qB:"Construye la frase en francés:",stages:"etapas"},
+fr:{sub:"Choisissez votre langue maternelle et votre niveau de français. Les consignes seront dans votre langue.",lblLang:"Langue maternelle",lblLevel:"Niveau de français",start:"Commencer",role:"Votre tuteur IA en 3D",hello:"Bonjour ! Je suis Rayan. Choisissez une étape sur la carte !",good:"Magnifique ! 🎉",bad:"Oups ! Pas de souci, continuez 💪",check:"Vérifier",cont:"Continuer",stage:"Étape",track:"Parcours du niveau",trackDesc:"Terminez toutes les étapes pour maîtriser ce niveau.",right:"Correct !",answer:"Bonne réponse :",done:"Leçon terminée !",xp:"XP gagnés",acc:"Précision",map:"Retour à la carte",over:"Plus de cœurs !",overTxt:"Ne baissez pas les bras. Rechargez vos cœurs et réessayez.",refill:"Recharger les cœurs",change:"Changer de langue / niveau",quit:"Quitter la leçon ? Votre progression sera perdue.",tagV:"Vocabulaire",tagG:"Grammaire",tagB:"Construction de phrase",qV:"Choisissez le mot français pour :",qG:"Complétez la phrase :",qB:"Construisez la phrase française :",stages:"étapes"},
+de:{sub:"Wähle deine Muttersprache und dein Französisch-Niveau. Alle Anweisungen erscheinen in deiner Sprache.",lblLang:"Muttersprache",lblLevel:"Französisch-Niveau",start:"Los geht's",role:"Dein 3D-KI-Tutor",hello:"Bonjour! Ich bin Rayan. Wähle eine Etappe auf der Karte!",good:"Magnifique! 🎉",bad:"Oups! Keine Sorge, weiter so 💪",check:"Prüfen",cont:"Weiter",stage:"Etappe",track:"Niveau-Pfad",trackDesc:"Schließe alle Etappen ab, um dieses Niveau zu meistern.",right:"Richtig!",answer:"Richtige Antwort:",done:"Lektion geschafft!",xp:"Erhaltene XP",acc:"Genauigkeit",map:"Zurück zur Karte",over:"Keine Herzen mehr!",overTxt:"Gib nicht auf. Lade deine Herzen auf und versuch es erneut.",refill:"Herzen aufladen",change:"Sprache / Niveau ändern",quit:"Lektion beenden? Der Fortschritt darin geht verloren.",tagV:"Vokabeln",tagG:"Grammatik",tagB:"Satzbau",qV:"Wähle das französische Wort für:",qG:"Vervollständige den Satz:",qB:"Bilde den französischen Satz:",stages:"Etappen"},
+zh:{sub:"请选择你的母语和法语水平。所有课程说明将以你的语言显示。",lblLang:"母语",lblLevel:"法语水平",start:"开始学习",role:"你的3D AI导师",hello:"Bonjour！我是Rayan。在地图上选一个关卡开始吧！",good:"太棒了！🎉",bad:"哎呀！别担心，继续加油 💪",check:"检查",cont:"继续",stage:"关卡",track:"等级路线",trackDesc:"完成所有关卡以掌握此等级。",right:"正确！",answer:"正确答案：",done:"课程完成！",xp:"获得经验",acc:"正确率",map:"返回地图",over:"爱心用完了！",overTxt:"不要放弃。补充爱心再试一次。",refill:"补充爱心",change:"更改语言 / 等级",quit:"退出本课？该课进度将丢失。",tagV:"词汇",tagG:"语法",tagB:"造句",qV:"选择对应的法语：",qG:"完成句子：",qB:"组成法语句子：",stages:"关卡"},
+ru:{sub:"Выберите родной язык и уровень французского. Все инструкции будут на вашем языке.",lblLang:"Родной язык",lblLevel:"Уровень французского",start:"Начать",role:"Ваш 3D ИИ-наставник",hello:"Bonjour! Я Райан. Выберите этап на карте, чтобы начать!",good:"Magnifique! 🎉",bad:"Упс! Не переживайте, продолжайте 💪",check:"Проверить",cont:"Далее",stage:"Этап",track:"Путь уровня",trackDesc:"Пройдите все этапы, чтобы освоить этот уровень.",right:"Верно!",answer:"Правильный ответ:",done:"Урок пройден!",xp:"Получено XP",acc:"Точность",map:"Назад к карте",over:"Сердца закончились!",overTxt:"Не сдавайтесь. Пополните сердца и попробуйте снова.",refill:"Пополнить сердца",change:"Сменить язык / уровень",quit:"Выйти из урока? Прогресс в нём будет потерян.",tagV:"Лексика",tagG:"Грамматика",tagB:"Составление фразы",qV:"Выберите французский вариант:",qG:"Дополните предложение:",qB:"Составьте французское предложение:",stages:"этапов"},
+pt:{sub:"Escolha seu idioma nativo e nível de francês. As instruções aparecerão no seu idioma.",lblLang:"Idioma nativo",lblLevel:"Nível de francês",start:"Começar",role:"Seu tutor 3D com IA",hello:"Bonjour! Eu sou o Rayan. Escolha uma etapa no mapa para começar!",good:"Magnifique! 🎉",bad:"Oups! Não se preocupe, continue 💪",check:"Verificar",cont:"Continuar",stage:"Etapa",track:"Trilha do nível",trackDesc:"Conclua todas as etapas para dominar este nível.",right:"Correto!",answer:"Resposta correta:",done:"Lição concluída!",xp:"XP ganhos",acc:"Precisão",map:"Voltar ao mapa",over:"Sem corações!",overTxt:"Não desista. Recarregue seus corações e tente de novo.",refill:"Recarregar corações",change:"Mudar idioma / nível",quit:"Sair da lição? Você perderá o progresso dela.",tagV:"Vocabulário",tagG:"Gramática",tagB:"Montar frase",qV:"Escolha o francês para:",qG:"Complete a frase:",qB:"Monte a frase em francês:",stages:"etapas"},
+tr:{sub:"Ana dilini ve Fransızca seviyeni seç. Tüm yönergeler kendi dilinde görünecek.",lblLang:"Ana dil",lblLevel:"Fransızca seviyesi",start:"Öğrenmeye başla",role:"3D yapay zekâ eğitmenin",hello:"Bonjour! Ben Rayan. Başlamak için haritadan bir aşama seç!",good:"Magnifique! 🎉",bad:"Hay aksi! Sorun değil, devam 💪",check:"Kontrol et",cont:"Devam",stage:"Aşama",track:"Seviye yolu",trackDesc:"Bu seviyede ustalaşmak için tüm aşamaları tamamla.",right:"Doğru!",answer:"Doğru cevap:",done:"Ders tamamlandı!",xp:"Kazanılan XP",acc:"Doğruluk",map:"Haritaya dön",over:"Kalbin bitti!",overTxt:"Vazgeçme. Kalplerini doldur ve tekrar dene.",refill:"Kalpleri doldur",change:"Dil / seviye değiştir",quit:"Dersten çıkılsın mı? Bu dersteki ilerlemen kaybolur.",tagV:"Kelime",tagG:"Dilbilgisi",tagB:"Cümle kurma",qV:"Şunun Fransızcasını seç:",qG:"Cümleyi tamamla:",qB:"Fransızca cümleyi oluştur:",stages:"aşama"},
+hi:{sub:"अपनी मातृभाषा और फ़्रेंच स्तर चुनें। सभी निर्देश आपकी भाषा में दिखेंगे।",lblLang:"मातृभाषा",lblLevel:"फ़्रेंच स्तर",start:"सीखना शुरू करें",role:"आपका 3D AI ट्यूटर",hello:"Bonjour! मैं रयान हूँ। शुरू करने के लिए नक्शे पर एक चरण चुनें!",good:"शानदार! 🎉",bad:"ओह! चिंता न करें, कोशिश जारी रखें 💪",check:"जाँचें",cont:"आगे बढ़ें",stage:"चरण",track:"स्तर पथ",trackDesc:"इस स्तर में महारत के लिए सभी चरण पूरे करें।",right:"सही!",answer:"सही उत्तर:",done:"पाठ पूरा हुआ!",xp:"अर्जित XP",acc:"सटीकता",map:"नक्शे पर लौटें",over:"दिल खत्म हो गए!",overTxt:"हार न मानें। दिल भरें और फिर कोशिश करें।",refill:"दिल भरें",change:"भाषा / स्तर बदलें",quit:"पाठ छोड़ें? इसकी प्रगति खो जाएगी।",tagV:"शब्दावली",tagG:"व्याकरण",tagB:"वाक्य निर्माण",qV:"इसके लिए फ़्रेंच चुनें:",qG:"वाक्य पूरा करें:",qB:"फ़्रेंच वाक्य बनाएँ:",stages:"चरण"}
+};
+// Strings for the new learning modes (English is the fallback for languages not listed here)
+const XI18N={
+en:{pick:"Choose how to learn",pickTip:"Tip: warm up with flashcards, then pass the lesson to unlock the next stage.",req:"Unlocks next stage",doneTag:"Completed",
+m_lesson:"Lesson",d_lesson:"Mixed questions. Pass it to unlock the next stage.",m_flash:"Flashcards",d_flash:"Flip 3D cards and review every word.",m_mem:"Memory match",d_mem:"Match each French word with its meaning.",
+m_listen:"Listening",d_listen:"Hear it, then pick what was said.",m_type:"Typing",d_type:"Type the French yourself.",m_speak:"Speaking",d_speak:"Say it aloud using your microphone.",m_speed:"Speed round",d_speed:"45 seconds. How many can you get?",
+qL:"What did you hear?",qT:"Type it in French:",qS:"Say it out loud:",tagL:"Listening",tagT:"Typing",tagS:"Speaking",again:"Again",gotIt:"Got it",tapFlip:"Tap the card to flip it",
+moves:"Moves",time:"Time",score:"Score",cards:"Cards",noMic:"Microphone not available here. You can skip this one.",skip:"Skip",accents:"Mind the accents:",heard:"I heard:",tapListen:"Tap to listen",pracDone:"Practice complete!",more:"More ways to learn",typePh:"Écris ici…",micTap:"Tap the mic and speak",micOn:"Listening…",speedT:"Speed round",correctN:"Correct"},
+ar:{pick:"اختر طريقة التعلم",pickTip:"نصيحة: ابدأ بالبطاقات ثم اجتز الدرس لفتح المرحلة التالية.",req:"يفتح المرحلة التالية",doneTag:"مكتمل",
+m_lesson:"الدرس",d_lesson:"أسئلة متنوعة. اجتزه لفتح المرحلة التالية.",m_flash:"البطاقات",d_flash:"اقلب البطاقات ثلاثية الأبعاد وراجع كل كلمة.",m_mem:"لعبة الذاكرة",d_mem:"طابق كل كلمة فرنسية مع معناها.",
+m_listen:"الاستماع",d_listen:"استمع ثم اختر ما سمعته.",m_type:"الكتابة",d_type:"اكتب الجملة بالفرنسية بنفسك.",m_speak:"التحدث",d_speak:"انطقها بصوت عالٍ باستخدام الميكروفون.",m_speed:"جولة السرعة",d_speed:"45 ثانية. كم إجابة تستطيع؟",
+qL:"ماذا سمعت؟",qT:"اكتبها بالفرنسية:",qS:"انطقها بصوت عالٍ:",tagL:"استماع",tagT:"كتابة",tagS:"تحدث",again:"مرة أخرى",gotIt:"عرفتها",tapFlip:"المس البطاقة لقلبها",
+moves:"الحركات",time:"الوقت",score:"النتيجة",cards:"البطاقات",noMic:"الميكروفون غير متاح هنا. يمكنك تخطي هذا السؤال.",skip:"تخطي",accents:"انتبه للتشكيل:",heard:"سمعت:",tapListen:"المس للاستماع",pracDone:"اكتمل التدريب!",more:"طرق تعلم أخرى",typePh:"اكتب هنا…",micTap:"المس الميكروفون وتحدث",micOn:"أستمع…",speedT:"جولة السرعة",correctN:"صحيحة"},
+fr:{pick:"Choisissez votre façon d'apprendre",pickTip:"Astuce : échauffez-vous avec les cartes, puis réussissez la leçon pour débloquer l'étape suivante.",req:"Débloque l'étape suivante",doneTag:"Terminé",
+m_lesson:"Leçon",d_lesson:"Questions variées. Réussissez-la pour débloquer la suite.",m_flash:"Cartes mémoire",d_flash:"Retournez des cartes 3D et révisez chaque mot.",m_mem:"Jeu de mémoire",d_mem:"Associez chaque mot français à son sens.",
+m_listen:"Écoute",d_listen:"Écoutez, puis choisissez ce qui a été dit.",m_type:"Écriture",d_type:"Écrivez vous-même le français.",m_speak:"Prononciation",d_speak:"Dites-le à voix haute avec votre micro.",m_speed:"Manche rapide",d_speed:"45 secondes. Combien en trouverez-vous ?",
+qL:"Qu'avez-vous entendu ?",qT:"Écrivez-le en français :",qS:"Dites-le à voix haute :",tagL:"Écoute",tagT:"Écriture",tagS:"Oral",again:"Encore",gotIt:"Je sais",tapFlip:"Touchez la carte pour la retourner",
+moves:"Coups",time:"Temps",score:"Score",cards:"Cartes",noMic:"Micro indisponible ici. Vous pouvez passer.",skip:"Passer",accents:"Attention aux accents :",heard:"J'ai entendu :",tapListen:"Touchez pour écouter",pracDone:"Entraînement terminé !",more:"Autres façons d'apprendre",typePh:"Écris ici…",micTap:"Touchez le micro et parlez",micOn:"J'écoute…",speedT:"Manche rapide",correctN:"Correctes"},
+es:{pick:"Elige cómo aprender",pickTip:"Consejo: calienta con tarjetas y luego supera la lección para desbloquear la siguiente etapa.",req:"Desbloquea la siguiente etapa",doneTag:"Completada",
+m_lesson:"Lección",d_lesson:"Preguntas variadas. Aprúebala para desbloquear la siguiente etapa.",m_flash:"Tarjetas",d_flash:"Gira tarjetas 3D y repasa cada palabra.",m_mem:"Memoria",d_mem:"Une cada palabra francesa con su significado.",
+m_listen:"Escucha",d_listen:"Escúchalo y elige lo que se dijo.",m_type:"Escritura",d_type:"Escribe tú mismo el francés.",m_speak:"Pronunciación",d_speak:"Dilo en voz alta con tu micrófono.",m_speed:"Ronda rápida",d_speed:"45 segundos. ¿Cuántas aciertas?",
+qL:"¿Qué has oído?",qT:"Escríbelo en francés:",qS:"Dilo en voz alta:",tagL:"Escucha",tagT:"Escritura",tagS:"Habla",again:"Otra vez",gotIt:"Lo sé",tapFlip:"Toca la tarjeta para girarla",
+moves:"Movimientos",time:"Tiempo",score:"Puntos",cards:"Tarjetas",noMic:"Micrófono no disponible aquí. Puedes saltarla.",skip:"Saltar",accents:"Ojo con los acentos:",heard:"He oído:",tapListen:"Toca para escuchar",pracDone:"¡Práctica completada!",more:"Más formas de aprender",typePh:"Escribe aquí…",micTap:"Toca el micro y habla",micOn:"Escuchando…",speedT:"Ronda rápida",correctN:"Correctas"}
+};
+const t=k=>{const l=S.lang;return (I18N[l]&&I18N[l][k])||(XI18N[l]&&XI18N[l][k])||I18N.en[k]||XI18N.en[k]||k};
+
+/* ============ Lesson content ============ */
+// v: [t, fr, en, ar]   g: [t, sentence, answer, "opt|opt|opt|opt", en, ar]   b: [t, fr, en, ar, "extra|extra"]
+const DB={
+A1:[
+["v","Bonjour","Hello / Good day","مرحباً / يوم سعيد"],["v","Merci","Thank you","شكراً"],["v","Au revoir","Goodbye","إلى اللقاء"],
+["v","Oui","Yes","نعم"],["g","Je ___ Karim.","suis","suis|es|est|sommes","I am Karim.","أنا كريم."],["b","Je parle français","I speak French.","أنا أتحدث الفرنسية.","suis|le"],
+["v","L'eau","Water","الماء"],["v","Le pain","Bread","الخبز"],["g","Elle ___ une pomme.","mange","mange|manges|mangez|mangent","She eats an apple.","هي تأكل تفاحة."],
+["b","Où est la gare","Where is the station?","أين المحطة؟","le|suis"],["v","Le chat","The cat","القط"],["v","La maison","The house","المنزل"],
+["g","Nous ___ au café.","allons","allons|vais|vas|vont","We go to the café.","نحن نذهب إلى المقهى."],["v","S'il vous plaît","Please","من فضلك"],["v","Bonsoir","Good evening","مساء الخير"],
+["b","J'aime le café","I like coffee.","أحب القهوة.","la|suis"],["v","Rouge","Red","أحمر"],["g","J'___ vingt ans.","ai","ai|suis|fais|vais","I am twenty years old.","عمري عشرون عاماً."]
+],
+A2:[
+["v","Un billet","A ticket","تذكرة"],["v","Le rendez-vous","Appointment / Meeting","موعد"],["v","Hier","Yesterday","أمس"],
+["v","Demain","Tomorrow","غداً"],["g","Hier, je ___ allé au cinéma.","suis","suis|ai|vais|étais","Yesterday, I went to the cinema.","ذهبت أمس إلى السينما."],["b","Je voudrais un café","I would like a coffee.","أود قهوة.","veux|des"],
+["v","Le voisin","The neighbour","الجار"],["v","Se lever","To get up","ينهض / يستيقظ"],["v","Fatigué","Tired","متعب"],
+["g","Je ne mange ___ de viande.","pas","pas|rien|personne|aucun","I don't eat meat.","لا آكل اللحم."],["b","Nous allons prendre le train","We are going to take the train.","سنستقل القطار.","à|ai"],["v","Le séjour","The stay","الإقامة"],
+["v","Réserver","To book","يحجز"],["g","Elle a ___ ses clés.","perdu","perdu|perdre|perdais|perdons","She lost her keys.","لقد أضاعت مفاتيحها."],["v","Pourtant","However / Yet","ومع ذلك"],
+["v","La circulation","Traffic","حركة المرور"],["b","Il y a beaucoup de monde","There are a lot of people.","هناك الكثير من الناس.","est|des"],["v","Un souvenir","A souvenir / A memory","ذكرى"]
+],
+B1:[
+["v","Avoir du pain sur la planche","To have a lot on one's plate","لديه الكثير من العمل"],["v","Être dans les nuages","To daydream","شارد الذهن"],["v","Un malentendu","A misunderstanding","سوء تفاهم"],
+["g","Si j'avais le temps, je ___ voyager.","pourrais","pourrais|pourrai|peux|pouvais","If I had time, I could travel.","لو كان لدي وقت لاستطعت السفر."],["b","Je suis en train de lire","I am in the middle of reading.","أنا في صدد القراءة.","vais|lis"],["v","Néanmoins","Nevertheless","مع ذلك"],
+["v","Un avis","An opinion","رأي"],["v","S'entendre bien","To get along well","ينسجم مع الآخرين"],["g","Je ne pense pas qu'il ___ raison.","ait","ait|a|aura|avait","I don't think he is right.","لا أظن أنه محق."],
+["b","Il faut que tu viennes","You have to come.","يجب أن تأتي.","viens|doit"],["v","Mettre la charrue avant les bœufs","To put the cart before the horse","وضع العربة أمام الحصان"],["v","Le quotidien","Daily life","الحياة اليومية"],
+["v","Un défi","A challenge","تحدٍّ"],["g","Les livres dont j'___ besoin sont ici.","ai","ai|suis|fais|vais","The books I need are here.","الكتب التي أحتاجها هنا."],["v","Se débrouiller","To manage / To get by","يتدبّر أمره"],
+["b","Elle m'a dit de venir","She told me to come.","طلبت مني أن آتي.","dire|me"],["v","Un enjeu","A stake","رهان / ما هو على المحك"],["g","Quand il ___, nous partirons.","arrivera","arrivera|arrive|arrivait|arriverait","When he arrives, we will leave.","عندما يصل سنغادر."]
+],
+B2:[
+["v","Concomitant","Simultaneous / Concomitant","متزامن / مصاحب"],["v","Préalable","Prior / Preliminary","مسبق / تمهيدي"],["v","Mettre en œuvre","To implement","ينفّذ"],
+["g","Bien qu'il ___ fatigué, il a continué.","soit","soit|est|était|sera","Although he was tired, he continued.","رغم أنه كان متعباً واصل."],["b","Cela dépend de la situation","That depends on the situation.","هذا يعتمد على الوضع.","à|dépendre"],["v","Un bouleversement","An upheaval","اضطراب جذري"],
+["v","Remettre en question","To call into question","يعيد النظر"],["v","Désormais","From now on","من الآن فصاعداً"],["g","Il faut ___ les risques avant de décider.","évaluer","évaluer|évalué|évalue|évaluons","You must assess the risks before deciding.","يجب تقييم المخاطر قبل اتخاذ القرار."],
+["b","Elle aurait dû nous prévenir","She should have warned us.","كان عليها أن تنبّهنا.","avait|dire"],["v","Un atout","An asset","ميزة / نقطة قوة"],["v","Susciter","To arouse / To provoke","يثير"],
+["g","À moins que tu ne ___ prêt, nous attendrons.","sois","sois|es|seras|étais","Unless you are ready, we will wait.","ما لم تكن جاهزاً سننتظر."],["v","Une lacune","A gap","ثغرة"],["v","Aboutir","To succeed / To lead to","يفضي إلى"],
+["b","Il s'agit d'un problème complexe","It is a complex issue.","الأمر يتعلق بمشكلة معقدة.","agit|une"],["v","Se rendre compte","To realise","يدرك"],["g","Les gens avec ___ je travaille sont aimables.","qui","qui|que|dont|où","The people I work with are kind.","الأشخاص الذين أعمل معهم لطفاء."]
+],
+C1:[
+["v","Incontournable","Unavoidable / Essential","لا مفر منه / أساسي"],["v","A fortiori","All the more so","من باب أولى"],["b","Cette étude met en exergue la logique","This study highlights the logic.","تسلّط هذه الدراسة الضوء على المنطق.","doute|sur"],
+["v","Pérenne","Lasting","دائم / مستمر"],["g","Quoi qu'il en ___, je maintiens ma position.","soit","soit|est|sera|serait","Be that as it may, I maintain my position.","مهما يكن من أمر أتمسك بموقفي."],["v","Corroborer","To corroborate","يؤكد / يعزز"],
+["v","Un clivage","A divide","انقسام"],["b","Il convient de nuancer ces propos","These remarks should be qualified.","ينبغي تلطيف هذه الأقوال.","convenir|ce"],["v","Fallacieux","Misleading / Fallacious","مضلّل"],
+["v","Tributaire","Dependent on","مرتهن / معتمد على"],["g","Force est de ___ que les résultats sont décevants.","constater","constater|constaté|constate|constatant","One must acknowledge the results are disappointing.","لا بد من الإقرار بأن النتائج مخيبة."],["v","Éluder","To evade","يتهرّب"],
+["v","Prôner","To advocate","يدعو إلى"],["b","Cela ne va pas sans difficultés","This is not without difficulties.","هذا لا يخلو من الصعوبات.","pas|avec"],["v","Un écueil","A pitfall","عقبة / مأزق"],
+["v","Dès lors","Hence / From then on","ومن ثمّ"],["g","Il a agi comme s'il ___ tout.","savait","savait|sait|saura|sache","He acted as if he knew everything.","تصرّف كأنه يعرف كل شيء."],["v","Étayer","To back up (an argument)","يدعم بالأدلة"]
+],
+C2:[
+["v","Tirer son épingle du jeu","To come out ahead skilfully","يخرج من الموقف بنجاح وذكاء"],["v","Faire l'unanimité","To win unanimous approval","يحظى بالإجماع"],["v","Faire volte-face","To do an about-turn","ينقلب فجأة / يغيّر موقفه"],
+["g","Nul ne saurait ___ cette évidence.","nier","nier|nie|nié|nions","No one could deny this obvious fact.","لا أحد يستطيع إنكار هذه الحقيقة."],["b","Il n'est pas jusqu'aux sceptiques qui ne s'y soient ralliés","Even the sceptics have come round to it.","حتى المتشككون انضمّوا إليه.","sont|rallier"],["v","Brûler les étapes","To rush ahead","يحرق المراحل"],
+["v","Jeter l'éponge","To throw in the towel","يستسلم"],["v","Une gageure","A tall order","رهان صعب"],["g","Qu'il pleuve ou qu'il ___, nous sortirons.","neige","neige|neigeait|neigera|neigé","Whether it rains or snows, we will go out.","سواء أمطرت أم ثلجت سنخرج."],
+["b","Chassez le naturel il revient au galop","Nature always returns.","الطبع يغلب التطبّع.","chasse|vient"],["v","Une ineptie","An absurdity","سخافة"],["v","Pourfendre","To denounce fiercely","يندّد بشدة"],
+["v","Mutatis mutandis","With the necessary changes","مع تغيير ما يلزم تغييره"],["g","Je doute qu'il y ___ une meilleure solution.","ait","ait|a|aura|avait","I doubt there is a better solution.","أشك في وجود حل أفضل."],["v","Ostentatoire","Ostentatious","استعراضي"],
+["b","À l'impossible nul n'est tenu","No one is bound to do the impossible.","لا تكليف بمستحيل.","tenue|pas"],["v","Un truisme","A truism","بديهية مبتذلة"],["g","Pour peu que vous ___ attentif, vous comprendrez.","soyez","soyez|êtes|serez|étiez","If you are the least bit attentive, you will understand.","إن كنتم منتبهين ولو قليلاً فستفهمون."]
+]
+};
+const PER_STAGE=3, STAGES=6;
+const frText=it=>it[0]==="g"?it[1].replace("___",it[2]):it[1];
+const mnArr=it=>it[0]==="g"?[it[4],it[5]]:[it[2],it[3]];
+const mean=it=>mnArr(it)[S.lang==="ar"?1:0];
+
+/* ============ State & helpers ============ */
+const KEY="academie-pro-v2";
+const blank=()=>({lang:"en",track:null,done:{A1:0,A2:0,B1:0,B2:0,C1:0,C2:0},xp:0,streak:0,last:null,hearts:5,sound:true});
+let S=blank();
+try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r)S=Object.assign(blank(),r,{done:Object.assign(blank().done,r.done||{})})}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:«»]/g,"").replace(/\s+/g," ").trim();
+const strip=s=>norm(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe").replace(/æ/g,"ae");
+function sim(a,b){a=strip(a);b=strip(b);if(!a||!b)return 0;const m=a.length,n=b.length;const d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return 1-d[m][n]/Math.max(m,n)}
+const today=()=>new Date().toISOString().slice(0,10);
+const restart=(e,c)=>{e.classList.remove(c);void e.offsetWidth;e.classList.add(c)};
+
+/* ============ Sound effects ============ */
+let AC;
+function sfx(k){
+  if(!S.sound)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const seq={ok:[[660,.09],[880,.14]],no:[[220,.16],[170,.22]],flip:[[520,.05],[620,.04]],win:[[523,.1],[659,.1],[784,.1],[1047,.28]]}[k];
+    let t0=AC.currentTime;
+    seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type=k==="no"?"sawtooth":"sine";o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.1,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+      o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+d+.02);t0+=d*.9});
+  }catch(e){}
+}
+
+/* ============ Header / language ============ */
+let PV={xp:null,hearts:null,streak:null};
+function renderHeader(){
+  $("vStreak").textContent=S.streak;$("vXp").textContent=S.xp;$("vHearts").textContent=S.hearts;$("lHearts").textContent=S.hearts;
+  $("btnSound").textContent=S.sound?"🔊":"🔇";
+  if(PV.xp!==null){
+    if(S.xp!==PV.xp)restart($("stXp"),"bump");
+    if(S.hearts!==PV.hearts){restart($("stHearts"),"bump");restart($("stLHearts"),"bump")}
+    if(S.streak!==PV.streak)restart($("stStreak"),"bump");
+  }
+  PV={xp:S.xp,hearts:S.hearts,streak:S.streak};
+  $("stHearts").classList.toggle("low",S.hearts<=2);$("stLHearts").classList.toggle("low",S.hearts<=2);
+}
+function applyLang(){
+  document.documentElement.lang=S.lang;
+  document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
+  renderHeader();renderMap();setBubble(t("hello"));
+}
+function setBubble(s){const b=$("bubble");b.textContent=s;restart(b,"pop")}
+
+/* ============ Map ============ */
+function tilt(e,max){
+  e.addEventListener("pointermove",ev=>{const r=e.getBoundingClientRect();const x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;
+    e.style.setProperty("--ry",(x*max*2).toFixed(1)+"deg");e.style.setProperty("--rx",(-y*max*2).toFixed(1)+"deg")});
+  e.addEventListener("pointerleave",()=>{e.style.setProperty("--rx","0deg");e.style.setProperty("--ry","0deg")});
+}
+function renderMap(){
+  if(!S.track)return;
+  const done=S.done[S.track];
+  $("trackTitle").textContent=`${S.track} · ${t("track")}`;
+  $("trackDesc").textContent=`${done}/${STAGES} ${t("stages")} · ${t("trackDesc")}`;
+  $("trackMeter").style.width=(done/STAGES*100)+"%";
+  const p=$("path");p.innerHTML="";
+  const dir=S.lang==="ar"?-1:1;
+  for(let i=1;i<=STAGES;i++){
+    const state=i<=done?"done":(i===done+1?"current":"locked");
+    const w=el("div","nodewrap");w.style.transform=`translateX(${Math.round(Math.sin(i*1.3)*60*dir)}px)`;
+    const b=el("button",`node ${state}`);b.style.setProperty("--i",i);
+    b.disabled=state==="locked";b.setAttribute("aria-label",`${t("stage")} ${i}`);
+    b.append(el("span","",state==="done"?"✓":state==="locked"?"🔒":String(i)),el("em","",`${t("stage")} ${i}`));
+    if(state!=="locked"){b.onclick=()=>openPicker(i);tilt(b,16)}
+    w.appendChild(b);p.appendChild(w);
+  }
+}
+
+/* ============ 3D floating background ============ */
+function makeBg(){
+  const L=$("bgLayer"),chars=["⚜","é","à","ç","œ","ê","ù","«","»","ô","î","?","!","✦"];
+  for(let i=0;i<18;i++){
+    const s=el("span","shp",chars[i%chars.length]);
+    s.style.left=(Math.random()*95)+"%";s.style.top=(Math.random()*95)+"%";
+    s.style.fontSize=(30+Math.random()*80)+"px";
+    s.style.setProperty("--z",(-300+Math.random()*500)+"px");
+    s.style.setProperty("--d",(8+Math.random()*10)+"s");
+    s.style.animationDelay=(-Math.random()*10)+"s";
+    L.appendChild(s);
+  }
+  window.addEventListener("pointermove",e=>{
+    const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;
+    L.style.transform=`rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
+  });
+}
+
+/* ============ Rayan 3D ============ */
+let renderer,scene,camera,bear,mouth,eyes=[],jump=0,shakeT=0,spinT=0,mouseX=0,blinkAt=0,clock,baseY=0,talkUntil=0;
+function init3D(){
+  const box=$("mascot");
+  try{
+    if(!window.THREE)throw 0;
+    renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+  }catch(e){box.textContent="🐻";box.onclick=()=>happy();return}
+  renderer.setSize(220,220);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  box.appendChild(renderer.domElement);
+  scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(42,1,.1,100);camera.position.set(0,.1,8);
+  scene.add(new THREE.AmbientLight(0xffffff,.75));
+  const d=new THREE.DirectionalLight(0xffffff,.85);d.position.set(4,8,8);scene.add(d);
+  const M=(c,s=20)=>new THREE.MeshPhongMaterial({color:c,shininess:s});
+  const fur=M(0x9a5c3a,12),inner=M(0xe6b98a),muz=M(0xf6e0b8),dark=M(0x1d0f06,60),red=M(0xd32f2f,10),cheek=M(0xff9a9a);
+  bear=new THREE.Group();
+  const S3=(r,m,x,y,z,sx=1,sy=1,sz=1)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(r,32,32),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);bear.add(o);return o};
+  S3(1.5,fur,0,0,0);
+  S3(.55,fur,-1.2,1.15,.1);S3(.55,fur,1.2,1.15,.1);
+  S3(.3,inner,-1.2,1.15,.5,1,1,.5);S3(.3,inner,1.2,1.15,.5,1,1,.5);
+  S3(.65,muz,0,-.4,1.1,1.2,.85,.9);
+  S3(.2,dark,0,-.12,1.78,1.2,.9,.9);
+  [-.55,.55].forEach(x=>{
+    const e=S3(.15,dark,x,.3,1.36);eyes.push(e);
+    S3(.045,M(0xffffff),x+.04,.36,1.5);
+    S3(.2,cheek,x*1.45,-.3,1.2,1,.7,.4);
+  });
+  mouth=new THREE.Mesh(new THREE.TorusGeometry(.2,.035,8,24,Math.PI),dark);
+  mouth.position.set(0,-.38,1.72);mouth.rotation.z=Math.PI;bear.add(mouth);
+  const beret=new THREE.Mesh(new THREE.CylinderGeometry(1.15,.85,.35,40),red);
+  beret.position.set(.15,1.5,.1);beret.rotation.z=-.22;bear.add(beret);
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.22,12),red);
+  stem.position.set(.25,1.78,.1);stem.rotation.z=-.22;bear.add(stem);
+  scene.add(bear);
+  clock=new THREE.Clock();
+  $("mascot").addEventListener("click",happy);
+  window.addEventListener("pointermove",e=>{mouseX=(e.clientX/innerWidth-.5)*2});
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(document.hidden)return;
+    const tm=clock.getElapsedTime(),now=performance.now();
+    let y=Math.sin(tm*2)*.1,x=0;
+    if(jump>0){jump=Math.max(0,jump-.02);y+=Math.sin((1-jump/.8)*Math.PI)*.9}
+    if(shakeT>0){shakeT=Math.max(0,shakeT-.02);x=Math.sin(shakeT*60)*.25*(shakeT/.5)}
+    bear.position.set(x,y,0);
+    baseY+=((mouseX*.4+Math.sin(tm*1.1)*.1)-baseY)*.08;
+    let spin=0;
+    if(spinT>0){spinT=Math.max(0,spinT-.018);const k=1-spinT;spin=(1-Math.pow(1-k,3))*Math.PI*2}
+    bear.rotation.y=baseY+spin;
+    bear.rotation.z=shakeT>0?Math.sin(shakeT*22)*.14:Math.sin(tm*1.6)*.03;
+    mouth.scale.y=talkUntil>now?1+Math.abs(Math.sin(tm*20))*1.1:1;
+    if(tm>blinkAt){const k=(tm-blinkAt)/.14;const s=k<1?1-Math.sin(k*Math.PI)*.9:1;eyes.forEach(e=>e.scale.y=s);if(k>1)blinkAt=tm+2+Math.random()*3}
+    renderer.render(scene,camera);
+  })();
+}
+function happy(){jump=.8;spinT=1}
+function sad(){shakeT=.5}
+
+/* ============ Speech ============ */
+let frVoice=null;
+function pickVoice(){if(!("speechSynthesis"in window))return;frVoice=speechSynthesis.getVoices().find(v=>/^fr/i.test(v.lang))||null}
+if("speechSynthesis"in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(text,rate=.9,force=false){
+  if((!S.sound&&!force)||!("speechSynthesis"in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";if(frVoice)u.voice=frVoice;u.rate=rate;
+  talkUntil=performance.now()+Math.min(7000,text.length*95/rate)+300;
+  speechSynthesis.speak(u);
+}
+
+/* ============ Shared: XP, streak, results ============ */
+function awardXP(n){
+  S.xp+=n;
+  const d=today();
+  if(S.last!==d){const y=new Date(Date.now()-864e5).toISOString().slice(0,10);S.streak=S.last===y?S.streak+1:1;S.last=d}
+  save();renderHeader();
+}
+function countUp(e,to,prefix,suffix){
+  const t0=performance.now(),dur=900;
+  (function f(now){const k=Math.min(1,(now-t0)/dur);e.textContent=prefix+Math.round(to*(1-Math.pow(1-k,3)))+suffix;if(k<1)requestAnimationFrame(f)})(t0);
+}
+let lastStage=1;
+function showResult(emoji,title,cells,withMore){
+  const r=$("resultBox");r.className="panel modal flip3d";r.innerHTML="";
+  r.append(el("div","big-emoji",emoji),el("h2","",title));
+  const g=el("div","result-grid");
+  cells.forEach(c=>{const d=el("div","",c.l);const b=el("b","");b.style.color=c.col;
+    if(typeof c.n==="number")countUp(b,c.n,c.pre||"",c.suf||"");else b.textContent=c.v;d.appendChild(b);g.appendChild(d)});
+  r.appendChild(g);
+  const b1=el("button","btn",t("map"));b1.onclick=()=>{$("result").hidden=true};r.appendChild(b1);
+  if(withMore){const b2=el("button","btn blue","🎮 "+t("more"));b2.onclick=()=>{$("result").hidden=true;openPicker(lastStage)};r.appendChild(b2)}
+  $("result").hidden=false;b1.focus();sfx("win");
+  confetti({particleCount:160,spread:90,origin:{y:.6},disableForReducedMotion:true});happy();
+}
+
+/* ============ Mode picker ============ */
+const MODES=[
+  {id:"lesson",ico:"📖",c:"#58cc02"},{id:"flash",ico:"🃏",c:"#1cb0f6"},{id:"mem",ico:"🧩",c:"#ffc800"},
+  {id:"listen",ico:"🎧",c:"#1cb0f6"},{id:"type",ico:"⌨️",c:"#ce82ff"},{id:"speak",ico:"🎤",c:"#ff4b4b"},{id:"speed",ico:"⚡",c:"#ffc800"}
+];
+function openPicker(n){
+  lastStage=n;
+  $("pickTitle").textContent=`${S.track} · ${t("stage")} ${n}`;
+  $("pickTip").textContent=t("pickTip");
+  const g=$("modes");g.innerHTML="";
+  MODES.forEach((m,i)=>{
+    const b=el("button","mode");b.style.setProperty("--i",i);b.style.setProperty("--c",m.c);
+    b.append(el("span","ico",m.ico),el("b","",t("m_"+m.id)),el("small","",t("d_"+m.id)));
+    if(m.id==="lesson"){
+      const isDone=n<=S.done[S.track];
+      b.appendChild(el("span","badge"+(isDone?" done":""),isDone?"✓ "+t("doneTag"):"★ "+t("req")));
+    }
+    b.onclick=()=>{closePicker();startMode(m.id,n)};
+    tilt(b,12);g.appendChild(b);
+  });
+  $("picker").hidden=false;sfx("flip");
+}
+function closePicker(){$("picker").hidden=true}
+function startMode(id,n){
+  if(id==="lesson")openLesson(n);
+  else if(id==="flash")startFlash(n);
+  else if(id==="mem")startMemory(n);
+  else if(id==="speed")startSpeed(n);
+  else openPractice(id,n);
+}
+function practicePool(n){
+  const pool=DB[S.track];
+  const cur=pool.slice((n-1)*PER_STAGE,n*PER_STAGE);
+  const prev=shuffle(pool.slice(0,(n-1)*PER_STAGE)).slice(0,5);
+  return shuffle([...cur,...prev]);
+}
+
+/* ============ Lesson engine (lesson, listening, typing, speaking) ============ */
+let L=null;
+function buildQ(it,pool,kind){
+  const [en,ar]=mnArr(it),ans=frText(it);
+  if(kind==="listen"){
+    const wrong=shuffle(pool.map(frText).filter(x=>x!==ans)).slice(0,3);
+    return{type:"l",answer:ans,speak:ans,en,ar,options:shuffle([ans,...wrong])};
+  }
+  if(kind==="type")return{type:"t",answer:ans,speak:ans,en,ar};
+  if(kind==="speak")return{type:"s",answer:ans,speak:ans,en,ar};
+  if(it[0]==="v"){
+    const wrong=shuffle(pool.filter(p=>p[0]==="v"&&p[1]!==it[1]).map(p=>p[1])).slice(0,3);
+    return{type:"v",answer:it[1],speak:it[1],en,ar,options:shuffle([it[1],...wrong])};
+  }
+  if(it[0]==="g")return{type:"g",sentence:it[1],answer:it[2],speak:ans,options:shuffle(it[3].split("|")),en,ar};
+  const words=[...it[1].split(" "),...it[4].split("|")].map((w,i)=>({w,id:i}));
+  return{type:"b",answer:it[1],speak:it[1],en,ar,bank:shuffle(words),placed:[]};
+}
+function startLesson(items,kind,practice,stage){
+  const pool=DB[S.track];
+  L={stage,practice,queue:items.map(i=>buildQ(i,pool,kind)),total:items.length,right:0,wrong:0,phase:"answer",sel:null,q:null,xp:0,canSkip:false,rec:null};
+  $("lesson").hidden=false;document.body.style.overflow="hidden";
+  nextQ();
+}
+function openLesson(n){
+  if(S.hearts<=0){showGameOver();return}
+  startLesson(DB[S.track].slice((n-1)*PER_STAGE,n*PER_STAGE),null,false,n);
+}
+function openPractice(kind,n){startLesson(practicePool(n),kind,true,n)}
+const meaning=q=>S.lang==="ar"?q.ar:q.en;
+const TAGS={v:"tagV",g:"tagG",b:"tagB",l:"tagL",t:"tagT",s:"tagS"},TITLES={v:"qV",g:"qG",b:"qB",l:"qL",t:"qT",s:"qS"};
+function nextQ(){
+  if(L.rec){try{L.rec.abort()}catch(e){}L.rec=null}
+  if(!L.queue.length)return finishLesson();
+  const q=L.q=L.queue.shift();
+  L.phase="answer";L.sel=null;L.canSkip=false;L.score=0;
+  $("foot").className="lfoot";$("footMsg").textContent="";
+  const main=$("btnMain");main.textContent=t("check");main.disabled=true;
+  $("lessonBar").style.width=(L.right/Math.max(1,L.total)*100)+"%";
+  renderHeader();
+  const a=$("qArea");a.innerHTML="";a.className="";restart(a,"qenter");
+  a.appendChild(el("div","tag",t(TAGS[q.type])));
+  a.appendChild(el("h2","qtitle",t(TITLES[q.type])));
+  const listenBtn=(rate)=>()=>speak(q.speak,rate,true);
+  if(q.type==="l"){
+    const w=el("div","listenbig");
+    const big=el("button","bigsay","🔊");big.setAttribute("aria-label",t("tapListen"));big.onclick=listenBtn(.9);
+    const slow=el("button","slow","🐢");slow.onclick=listenBtn(.55);
+    w.append(big,slow);a.appendChild(w);
+  }else{
+    const pr=el("div","prompt");
+    if(q.type!=="t"){const sp=el("button","say","🔊");sp.setAttribute("aria-label","Listen");sp.onclick=listenBtn(.9);pr.appendChild(sp)}
+    const txt=el("span");
+    if(q.type==="g"){
+      const [pre,post]=q.sentence.split("___");
+      txt.append(pre);const bl=el("span","blank"," ");bl.id="blank";txt.append(bl,post||"");
+    }else if(q.type==="s")txt.textContent=q.answer;
+    else txt.textContent=meaning(q);
+    pr.appendChild(txt);a.appendChild(pr);
+    if(q.type==="g"||q.type==="s"){const m=el("p","hint",meaning(q));m.style.cssText="margin:-.8rem 0 1.2rem;font-size:.9rem";a.appendChild(m)}
+  }
+  if(q.type==="b"){
+    const slot=el("div","slot");slot.id="slot";const bank=el("div","bank");bank.id="bank";a.append(slot,bank);renderBuilder();
+  }else if(q.type==="t"){
+    const inp=el("input","tin");inp.id="tin";inp.type="text";inp.autocomplete="off";inp.autocapitalize="off";inp.spellcheck=false;inp.lang="fr";inp.placeholder=t("typePh");
+    inp.oninput=()=>{L.sel=inp.value;main.disabled=!inp.value.trim()};
+    a.appendChild(inp);
+    const ac=el("div","accents");
+    ["é","è","ê","à","â","ç","ô","î","ù","û","œ","ë","ï"].forEach(ch=>{
+      const b=el("button","",ch);b.type="button";
+      b.onmousedown=e=>e.preventDefault();
+      b.onclick=()=>{const s=inp.selectionStart??inp.value.length,e2=inp.selectionEnd??s;inp.value=inp.value.slice(0,s)+ch+inp.value.slice(e2);inp.focus();inp.setSelectionRange(s+1,s+1);inp.oninput()};
+      ac.appendChild(b)});
+    a.appendChild(ac);setTimeout(()=>inp.focus(),350);
+  }else if(q.type==="s"){
+    const mw=el("div","micwrap");
+    const mic=el("button","mic","🎤");mic.id="micBtn";mic.setAttribute("aria-label",t("micTap"));mic.onclick=()=>startMic(q);
+    const hd=el("div","heard",t("micTap"));hd.id="heard";mw.append(mic,hd);a.appendChild(mw);
+    if(!(window.SpeechRecognition||window.webkitSpeechRecognition))micFail();
+  }else{
+    const g=el("div","opts");g.id="opts";
+    q.options.forEach((o,i)=>{
+      const b=el("button","opt");b.style.setProperty("--i",i);
+      b.append(el("kbd","",String(i+1)),el("span","",o));
+      b.onclick=()=>{if(L.phase!=="answer")return;L.sel=o;sfx("flip");g.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");main.disabled=false;if(q.type==="v")speak(o)};
+      g.appendChild(b);
+    });
+    a.appendChild(g);
+  }
+  if(q.type==="v"||q.type==="g"||q.type==="b"||q.type==="l")speak(q.speak);
+}
+function renderBuilder(){
+  const q=L.q,slot=$("slot"),bank=$("bank");slot.innerHTML="";bank.innerHTML="";
+  q.placed.forEach(c=>{
+    const b=el("button","wchip",c.w);
+    b.onclick=()=>{if(L.phase!=="answer")return;q.placed=q.placed.filter(x=>x.id!==c.id);sfx("flip");renderBuilder()};
+    slot.appendChild(b);
+  });
+  q.bank.forEach(c=>{
+    const b=el("button","wchip",c.w);
+    if(q.placed.some(x=>x.id===c.id)){b.classList.add("ghost");b.disabled=true}
+    b.onclick=()=>{if(L.phase!=="answer")return;q.placed.push(c);sfx("flip");renderBuilder();speak(c.w)};
+    bank.appendChild(b);
+  });
+  $("btnMain").disabled=q.placed.length===0||L.phase!=="answer";
+}
+/* speaking */
+function micFail(msg){
+  const h=$("heard");if(h)h.textContent=msg||t("noMic");
+  L.canSkip=true;const m=$("btnMain");m.textContent=t("skip");m.disabled=false;
+  const mb=$("micBtn");if(mb)mb.classList.remove("on");
+}
+function startMic(q){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){micFail();return}
+  if(L.rec){try{L.rec.abort()}catch(e){}}
+  if("speechSynthesis"in window)speechSynthesis.cancel();
+  const r=new SR();L.rec=r;r.lang="fr-FR";r.maxAlternatives=3;r.interimResults=false;
+  $("micBtn").classList.add("on");$("heard").textContent=t("micOn");
+  r.onresult=e=>{
+    const alts=[...e.results[0]].map(x=>x.transcript);let best=alts[0],bs=-1;
+    alts.forEach(x=>{const s=sim(x,q.answer);if(s>bs){bs=s;best=x}});
+    L.sel=best;L.score=bs;L.canSkip=false;
+    $("heard").textContent=t("heard")+" "+best;
+    const m=$("btnMain");m.textContent=t("check");m.disabled=false;
+  };
+  r.onerror=e=>{if(e.error==="no-speech"){$("heard").textContent=t("micTap");$("micBtn").classList.remove("on")}else micFail()};
+  r.onend=()=>{const mb=$("micBtn");if(mb)mb.classList.remove("on")};
+  try{r.start()}catch(e){micFail()}
+}
+function checkAnswer(){
+  const q=L.q;let ok,note="";
+  if(q.type==="b")ok=norm(q.placed.map(c=>c.w).join(" "))===norm(q.answer);
+  else if(q.type==="t"){
+    ok=norm(L.sel)===norm(q.answer);
+    if(!ok&&strip(L.sel)===strip(q.answer)){ok=true;note=t("accents")+" "+q.answer}
+    $("tin").disabled=true;
+  }else if(q.type==="s")ok=L.score>=.72;
+  else ok=L.sel===q.answer;
+  L.phase="feedback";
+  $("foot").className="lfoot "+(ok?"ok":"no");
+  const fm=$("footMsg");fm.innerHTML="";
+  fm.appendChild(el("strong","",ok?t("right"):t("answer")));
+  if(!ok)fm.appendChild(el("span","",q.type==="g"?q.sentence.replace("___",q.answer):q.answer));
+  if(ok&&note)fm.appendChild(el("span","",note));
+  if(q.type==="s"&&L.sel)fm.appendChild(el("span","",t("heard")+" "+L.sel));
+  if(q.options){
+    document.querySelectorAll("#opts .opt").forEach(b=>{
+      const v=b.querySelector("span").textContent;b.disabled=true;
+      if(v===q.answer)b.classList.add("ok");else if(v===L.sel)b.classList.add("no");
+    });
+    if(q.type==="g")$("blank").textContent=ok?q.answer:L.sel;
+  }else if(q.type==="b")document.querySelectorAll("#bank .wchip").forEach(b=>b.disabled=true);
+  if(ok){
+    L.right++;L.xp+=10;S.xp+=10;happy();setBubble(t("good"));sfx("ok");
+    $("lessonBar").style.width=(L.right/Math.max(1,L.total)*100)+"%";
+    confetti({particleCount:40,spread:60,origin:{y:.85},disableForReducedMotion:true});
+  }else{
+    L.wrong++;sad();setBubble(t("bad"));sfx("no");
+    if(!L.practice)S.hearts=Math.max(0,S.hearts-1);
+    restart($("qArea"),"shake");
+    q.tries=(q.tries||0)+1;
+    if(!L.practice||q.tries<2){
+      const again=Object.assign({},q);
+      if(again.type==="b"){again.placed=[];again.bank=shuffle(again.bank)}
+      else if(again.options)again.options=shuffle(again.options);
+      L.queue.push(again);
+    }
+  }
+  if(q.type!=="s")speak(q.speak);
+  save();renderHeader();
+  $("btnMain").textContent=t("cont");$("btnMain").disabled=false;
+}
+function onMain(){
+  if(!L)return;
+  if(L.phase==="answer"){
+    if(L.canSkip&&L.sel==null){L.total=Math.max(1,L.total-1);nextQ();return}
+    checkAnswer();
+  }else if(!L.practice&&S.hearts<=0&&L.queue.length)endLesson(true);
+  else nextQ();
+}
+function finishLesson(){
+  const bonus=L.practice?10:20;L.xp+=bonus;
+  if(!L.practice&&L.stage===S.done[S.track]+1)S.done[S.track]=L.stage;
+  const xp=L.xp,acc=Math.round(L.right/Math.max(1,L.right+L.wrong)*100),practice=L.practice;
+  S.xp+=bonus;awardXP(0);renderMap();
+  endLesson(false);
+  showResult(practice?"🎯":"🏆",t(practice?"pracDone":"done"),[{l:t("xp"),n:xp,pre:"+",col:"var(--blue)"},{l:t("acc"),n:acc,suf:"%",col:"var(--green)"}],true);
+  setBubble(t("good"));
+}
+function endLesson(gameOver){
+  if(L&&L.rec){try{L.rec.abort()}catch(e){}}
+  $("lesson").hidden=true;document.body.style.overflow="";
+  if("speechSynthesis"in window)speechSynthesis.cancel();
+  L=null;
+  if(gameOver)showGameOver();
+}
+function showGameOver(){
+  const r=$("resultBox");r.className="panel modal flip3d";r.innerHTML="";
+  r.append(el("div","big-emoji","💔"),el("h2","",t("over")));r.firstChild.style.animation="none";
+  r.querySelector("h2").style.color="var(--red)";
+  r.append(el("p","",t("overTxt")));
+  const b=el("button","btn red",t("refill"));
+  b.onclick=()=>{S.hearts=5;save();renderHeader();$("result").hidden=true};
+  r.appendChild(b);
+  $("result").hidden=false;b.focus();sad();sfx("no");
+}
+
+/* ============ Practice: flashcards / memory / speed ============ */
+let P=null;
+function openPrac(){$("prac").hidden=false;document.body.style.overflow="hidden";$("pracBody").innerHTML=""}
+function closePrac(){
+  if(P&&P.timer)clearInterval(P.timer);P=null;
+  $("prac").hidden=true;document.body.style.overflow="";
+  if("speechSynthesis"in window)speechSynthesis.cancel();
+}
+function startFlash(n){
+  const items=practicePool(n);
+  P={kind:"flash",queue:items.slice(),total:items.length,known:0};
+  $("pracInfo").textContent="🃏 "+items.length;
+  openPrac();renderFlash();
+}
+function renderFlash(){
+  const b=$("pracBody");b.innerHTML="";
+  $("pracBar").style.width=(P.known/P.total*100)+"%";
+  if(!P.queue.length){
+    const xp=P.known*3+10,k=P.known;closePrac();awardXP(xp);
+    showResult("🃏",t("pracDone"),[{l:t("xp"),n:xp,pre:"+",col:"var(--blue)"},{l:t("cards"),n:k,col:"var(--green)"}],true);return;
+  }
+  const it=P.queue[0];
+  const scene=el("div","scene3d"),card=el("div","fcard");
+  const f=el("div","face f"),bk=el("div","face b");
+  f.append(el("span","",frText(it)),el("small","","🔊"));
+  bk.append(el("span","",mean(it)),el("small","",frText(it)));
+  card.append(f,bk);scene.appendChild(card);
+  const hint=el("div","hint",t("tapFlip"));
+  const row=el("div","frow");
+  const again=el("button","btn red","↺ "+t("again")),ok=el("button","btn","✓ "+t("gotIt"));
+  again.disabled=ok.disabled=true;
+  let flipped=false;
+  card.onclick=()=>{flipped=!flipped;card.classList.toggle("flip",flipped);sfx("flip");if(!flipped)speak(frText(it));else{again.disabled=ok.disabled=false}};
+  const done=(good)=>{
+    if(scene.classList.contains("out-ok")||scene.classList.contains("out-no"))return;
+    scene.classList.add(good?"out-ok":"out-no");sfx(good?"ok":"no");if(good)happy();
+    setTimeout(()=>{P.queue.shift();if(good)P.known++;else P.queue.push(it);renderFlash()},430);
+  };
+  again.onclick=()=>done(false);ok.onclick=()=>done(true);
+  row.append(again,ok);b.append(scene,hint,row);
+  speak(frText(it));
+}
+function startMemory(n){
+  const items=practicePool(n).slice(0,6);
+  let tiles=[];
+  items.forEach((it,i)=>{tiles.push({id:i,kind:"f",text:frText(it)});tiles.push({id:i,kind:"m",text:mean(it)})});
+  P={kind:"mem",tiles:shuffle(tiles),open:[],matched:0,pairs:items.length,moves:0,lock:false,start:Date.now()};
+  $("pracInfo").textContent="🧩 0";
+  openPrac();
+  const b=$("pracBody");
+  const info=el("div","minfo");info.id="minfo";b.appendChild(info);
+  const grid=el("div","mgrid");
+  P.tiles.forEach((tl,i)=>{
+    const d=el("div","tile");d.style.setProperty("--i",i);
+    const inner=el("div","tinner");inner.append(el("div","tf","⚜️"),el("div","tb",tl.text));d.appendChild(inner);
+    d.onclick=()=>flipTile(tl,d);tl.node=d;grid.appendChild(d);
+  });
+  b.appendChild(grid);updMem();
+}
+function updMem(){
+  $("pracBar").style.width=(P.matched/P.pairs*100)+"%";
+  $("pracInfo").textContent="🧩 "+P.moves;
+  const i=$("minfo");if(i)i.textContent=`${t("moves")}: ${P.moves} · ${P.matched}/${P.pairs}`;
+}
+function flipTile(tl,d){
+  if(P.lock||d.classList.contains("open")||d.classList.contains("done"))return;
+  d.classList.add("open");sfx("flip");if(tl.kind==="f")speak(tl.text);
+  P.open.push(tl);
+  if(P.open.length<2)return;
+  P.moves++;P.lock=true;
+  const [a,b]=P.open;P.open=[];
+  if(a.id===b.id&&a.kind!==b.kind){
+    setTimeout(()=>{[a,b].forEach(x=>{x.node.classList.remove("open");x.node.classList.add("done")});
+      P.matched++;P.lock=false;sfx("ok");happy();updMem();
+      confetti({particleCount:30,spread:50,origin:{y:.7},disableForReducedMotion:true});
+      if(P.matched===P.pairs){
+        const moves=P.moves,secs=Math.round((Date.now()-P.start)/1000),xp=Math.max(15,50-2*(moves-P.pairs));
+        setTimeout(()=>{closePrac();awardXP(xp);showResult("🧩",t("pracDone"),[{l:t("xp"),n:xp,pre:"+",col:"var(--blue)"},{l:t("moves"),n:moves,col:"var(--gold)"}],true)},700);
+      }},450);
+  }else{
+    [a,b].forEach(x=>x.node.classList.add("bad"));
+    setTimeout(()=>{[a,b].forEach(x=>{x.node.classList.remove("open","bad")});P.lock=false;sfx("no");updMem()},950);
+  }
+  updMem();
+}
+function startSpeed(n){
+  const pool=DB[S.track],seen=pool.slice(0,n*PER_STAGE).filter(i=>i[0]==="v"),allV=pool.filter(i=>i[0]==="v");
+  const src=seen.length?seen:allV;
+  P={kind:"speed",src,allV,qs:shuffle(src),qi:0,score:0,ms:45000,total:45000,last:performance.now()};
+  $("pracInfo").textContent="⚡ 0";
+  openPrac();renderSpeed();
+  P.timer=setInterval(()=>{
+    const now=performance.now();P.ms-=now-P.last;P.last=now;
+    const bar=$("tbar");if(bar)bar.style.transform=`scaleX(${Math.max(0,P.ms/P.total)})`;
+    $("pracBar").style.width=(Math.max(0,P.ms)/P.total*100)+"%";
+    if(P.ms<=0)endSpeed();
+  },80);
+}
+function renderSpeed(){
+  const b=$("pracBody");b.innerHTML="";
+  if(P.qi>=P.qs.length){P.qs=shuffle(P.src);P.qi=0}
+  const it=P.qs[P.qi],ans=it[1];
+  const wrong=shuffle(P.allV.map(x=>x[1]).filter(x=>x!==ans)).slice(0,3);
+  const wrap=el("div","");wrap.style.cssText="width:100%";restart(wrap,"qenter");
+  const tm=el("div","timer");const bar=el("b");bar.id="tbar";tm.appendChild(bar);
+  const sc=el("div","sbig",String(P.score));sc.style.textAlign="center";sc.style.marginBottom=".6rem";
+  const pr=el("div","prompt",mean(it));
+  const g=el("div","opts");
+  shuffle([ans,...wrong]).forEach((o,i)=>{
+    const bt=el("button","opt");bt.style.setProperty("--i",i);bt.append(el("kbd","",String(i+1)),el("span","",o));
+    bt.onclick=()=>{
+      if(!P)return;
+      if(o===ans){P.score++;sfx("ok");happy();speak(ans)}else{P.ms-=3000;sfx("no");sad()}
+      $("pracInfo").textContent="⚡ "+P.score;P.qi++;renderSpeed();
+    };
+    g.appendChild(bt);
+  });
+  wrap.append(tm,sc,pr,g);b.appendChild(wrap);
+  bar.style.transform=`scaleX(${Math.max(0,P.ms/P.total)})`;
+}
+function endSpeed(){
+  if(!P)return;const score=P.score,xp=score*3+5;closePrac();awardXP(xp);
+  showResult("⚡",t("speedT"),[{l:t("correctN"),n:score,col:"var(--gold)"},{l:t("xp"),n:xp,pre:"+",col:"var(--blue)"}],true);
+}
+
+/* ============ Events ============ */
+$("btnMain").onclick=onMain;
+$("btnQuit").onclick=()=>{if(confirm(t("quit")))endLesson(false)};
+$("pracX").onclick=closePrac;
+$("pickX").onclick=closePicker;
+$("btnSound").onclick=()=>{S.sound=!S.sound;if(!S.sound&&"speechSynthesis"in window)speechSynthesis.cancel();save();renderHeader()};
+$("btnChange").onclick=()=>{$("selLang").value=S.lang;$("selLevel").value=S.track;$("onboard").hidden=false};
+$("selLang").onchange=e=>{S.lang=e.target.value;applyLang()};
+$("obForm").onsubmit=e=>{
+  e.preventDefault();
+  S.lang=$("selLang").value;S.track=$("selLevel").value;save();
+  $("onboard").hidden=true;applyLang();happy();sfx("win");
+};
+document.addEventListener("keydown",e=>{
+  if(!$("picker").hidden&&e.key==="Escape"){closePicker();return}
+  if(!$("prac").hidden){
+    if(e.key==="Escape"){closePrac();return}
+    if(P&&P.kind==="speed"&&/^[1-4]$/.test(e.key)){const bt=document.querySelectorAll("#pracBody .opt")[+e.key-1];if(bt)bt.click()}
+    return;
+  }
+  if($("lesson").hidden||!L)return;
+  if(e.key==="Escape"){$("btnQuit").click();return}
+  if(e.key==="Enter"&&!$("btnMain").disabled){e.preventDefault();onMain();return}
+  if(L.phase==="answer"&&L.q.options&&/^[1-4]$/.test(e.key)&&e.target.tagName!=="INPUT"){
+    const b=document.querySelectorAll("#opts .opt")[+e.key-1];if(b)b.click();
+  }
+});
+
+/* ============ Boot ============ */
+window.addEventListener("load",()=>{
+  makeBg();init3D();
+  $("selLang").value=S.lang;
+  if(!S.track){S.track="A1";$("onboard").hidden=false}
+  else $("onboard").hidden=true;
+  applyLang();
+  setTimeout(happy,900);
+});
+</script>
+</body>
+</html>
